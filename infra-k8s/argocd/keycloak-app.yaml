@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "htt[://charts.bitnami.com/bitnami"
+    repoURL: "http://charts.bitnami.com/bitnami"
     chart: keycloak
     targetRevision: "21.x.x"
     helm:
