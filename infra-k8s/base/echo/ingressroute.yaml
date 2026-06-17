@@ -8,6 +8,8 @@ spec:
   routes:
     - match: Host(`echo.localhost`)
       kind: Rule
+      middlewares:
+        - name: rate-limit
       services:
         - name: echo
           port: 80
