@@ -1,0 +1,49 @@
+name: webhook-service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/webhook-service/**
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}/webhook-service
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/webhook-service
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+
+      - name: Update image tag in overlay
+        run: |
+          cd infra-k8s/overlays/dev
+          kustomize edit set image ${{ env.IMAGE }}:${{ github.sha }}
+
+      - name: Commit and push updated tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infra-k8s/overlays/dev/kustomization.yaml
+          git commit -m "chore: deploy webhook-service@${{ github.sha }}"
+          git push
