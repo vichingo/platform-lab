@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: keycloak-auth
+spec:
+  forwardAuth:
+    address: "http://oauth2-proxy.dev.svc.cluster.local:4180/oauth2/auth"
+    authResponseHeaders:
+      - "X-Auth-Request-User"
+      - "X-Auth-Request-Email"

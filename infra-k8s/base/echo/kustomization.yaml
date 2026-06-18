@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - ingressroute.yaml
+  - ingressroute-protected.yaml
   - middleware.yaml
