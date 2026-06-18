@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log/slog"
 	"os"
@@ -9,9 +10,37 @@ import (
 	"time"
 
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
+func initTracer(ctx context.Context) func() {
+	exp, err := otlptracegrpc.New(ctx)
+	if err != nil {
+		slog.Error("failed to create OTLP exporter", "err", err)
+		os.Exit(1)
+	}
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exp),
+		sdktrace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceName("event-processor"),
+		)),
+	)
+	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+	return func() { tp.Shutdown(ctx) }
+}
+
 func main() {
+	ctx := context.Background()
+	shutdown := initTracer(ctx)
+	defer shutdown()
+
 	natsURL := os.Getenv("NATS_URL")
 	if natsURL == "" {
 		natsURL = nats.DefaultURL
@@ -31,7 +60,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Create stream if it doesn't exist
 	_, err = js.AddStream(&nats.StreamConfig{
 		Name:     "WEBHOOKS",
 		Subjects: []string{"webhooks.events"},
@@ -43,13 +71,14 @@ func main() {
 	}
 	slog.Info("WEBHOOKS stream ready")
 
-	// Durable pull consumer — KEDA watches this consumer's pending count
 	sub, err := js.PullSubscribe("webhooks.events", "webhook-processor")
 	if err != nil {
 		slog.Error("failed to subscribe", "err", err)
 		os.Exit(1)
 	}
 	slog.Info("event-processor ready, waiting for events")
+
+	tracer := otel.Tracer("event-processor")
 
 	go func() {
 		for {
@@ -62,10 +91,21 @@ func main() {
 				continue
 			}
 			for _, msg := range msgs {
+				// Extract trace context from NATS headers to continue the trace from webhook-service
+				carrier := propagation.MapCarrier{}
+				for k := range msg.Header {
+					carrier[k] = msg.Header.Get(k)
+				}
+				ctx := otel.GetTextMapPropagator().Extract(context.Background(), carrier)
+
+				_, span := tracer.Start(ctx, "event.process")
+
 				var payload map[string]any
 				json.Unmarshal(msg.Data, &payload)
-				slog.Info("processing event", "payload", payload)
+				slog.InfoContext(ctx, "processing event", "payload", payload)
 				msg.Ack()
+
+				span.End()
 			}
 		}
 	}()
