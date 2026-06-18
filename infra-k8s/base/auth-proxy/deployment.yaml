@@ -7,33 +7,33 @@ spec:
   selector:
     matchLabels:
       app: oauth2-proxy
-template:
-  metadata:
-    labels:
-      app: oauth2-proxy
-  spec:
-    containers:
-      - name: oauth2-proxy
-        image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
-        args:
-          - --provider=keycloak-oidc
-          - --client-id=webhook-service
-          - --client-secret=b9DQc6V3jUomNRQGMosu4xNGogSvRQ6r
-          - --oidc-issuer-url=http://auth.localhost/realms/platform-lab
-          - --upstream=static://200
-          - --http-address=0.0.0.0:4180
-          - --skip-jwt-bearer-tokens=true
-          - --email-domain=*
-          - --cookie-secret=c2VjcmV0MTIzNDU2Nzg=
-        ports:
-          - containerPort: 4180
-        resources:
-          requests:
-            cpu: 10m
-            memory: 32Mi
-          limits:
-            cpu: 100m
-            memory: 128Mi
+  template:
+    metadata:
+      labels:
+        app: oauth2-proxy
+    spec:
+      containers:
+        - name: oauth2-proxy
+          image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+          args:
+            - --provider=keycloak-oidc
+            - --client-id=webhook-service
+            - --client-secret=b9DQc6V3jUomNRQGMosu4xNGogSvRQ6r
+            - --oidc-issuer-url=http://auth.localhost/realms/platform-lab
+            - --upstream=static://200
+            - --http-address=0.0.0.0:4180
+            - --skip-jwt-bearer-tokens=true
+            - --email-domain=*
+            - --cookie-secret=c2VjcmV0MTIzNDU2Nzg=
+          ports:
+            - containerPort: 4180
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
 ---
 apiVersion: v1
 kind: Service
