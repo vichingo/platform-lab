@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -91,10 +92,12 @@ func main() {
 				continue
 			}
 			for _, msg := range msgs {
-				// Extract trace context from NATS headers to continue the trace from webhook-service
+				// Extract trace context from NATS headers to continue the trace from webhook-service.
+				// NATS canonicalizes header keys (e.g. "traceparent" → "Traceparent"),
+				// so we normalize back to lowercase for the OTel propagator.
 				carrier := propagation.MapCarrier{}
 				for k := range msg.Header {
-					carrier[k] = msg.Header.Get(k)
+					carrier[strings.ToLower(k)] = msg.Header.Get(k)
 				}
 				ctx := otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 
