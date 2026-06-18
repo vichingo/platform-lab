@@ -24,6 +24,12 @@ spec:
             limits:
               cpu: 100m
               memory: 64Mi
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: echo-api-key
+                  key: api_key
 ---
 apiVersion: v1
 kind: Service
