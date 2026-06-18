@@ -3,3 +3,6 @@ kind: Kustomization
 resources:
   - ../../base
 namespace: dev
+images:
+  - name: ghcr.io/vichingo/platform-lab/webhook-service
+    newTag: latest

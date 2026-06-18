@@ -6,3 +6,4 @@ resources:
   - keycloak/
   - auth-proxy/
   - vault/
+  - webhook-service/
