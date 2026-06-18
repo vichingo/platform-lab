@@ -4,7 +4,7 @@ resources:
 - ../../base
 namespace: dev
 images:
-- name: ghcr.io/vichingo/platform-lab/webhook-service
-  newTag: 4883c79a7525c8cb877c53c487683ddbddbeb49d
 - name: ghcr.io/vichingo/platform-lab/event-processor
   newTag: latest
+- name: ghcr.io/vichingo/platform-lab/webhook-service
+  newTag: b429984750748389a37dbff905ec9586475545ac
