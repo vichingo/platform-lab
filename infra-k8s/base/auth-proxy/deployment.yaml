@@ -24,7 +24,7 @@ spec:
             - --http-address=0.0.0.0:4180
             - --skip-jwt-bearer-tokens=true
             - --email-domain=*
-            - --cookie-secret=slZN/0kuDAowb3lZF3CQiG4OX6aOOUGkG6PePnlG+1w=
+            - --cookie-secret=d8810fabf5a3366199434e3c3711fa38
           ports:
             - containerPort: 4180
           resources:
