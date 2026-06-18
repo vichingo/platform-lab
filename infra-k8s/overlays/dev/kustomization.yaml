@@ -7,4 +7,4 @@ images:
 - name: ghcr.io/vichingo/platform-lab/event-processor
   newTag: 1358bf0e0390370bb0f32344da64d1b95665f4f7
 - name: ghcr.io/vichingo/platform-lab/webhook-service
-  newTag: b429984750748389a37dbff905ec9586475545ac
+  newTag: d782374568b79f96efadeeb7a884572907fa5311
