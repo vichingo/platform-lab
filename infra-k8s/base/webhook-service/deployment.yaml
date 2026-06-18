@@ -47,9 +47,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: webhook-service
+  labels:
+    app: webhook-service
 spec:
   selector:
     app: webhook-service
   ports:
-    - port: 80
+    - name: http
+      port: 80
+      targetPort: 8080
+    - name: metrics
+      port: 9090
       targetPort: 8080
