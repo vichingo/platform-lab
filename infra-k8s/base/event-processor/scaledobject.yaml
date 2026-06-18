@@ -10,7 +10,7 @@ spec:
   triggers:
     - type: nats-jetstream
       metadata:
-        natsServerMonitoringEndpoint: nats.dev.svc.cluster.local:8222
+        natsServerMonitoringEndpoint: nats-headless.dev.svc.cluster.local:8222
         account: "$G"
         stream: WEBHOOKS
         consumer: webhook-processor
