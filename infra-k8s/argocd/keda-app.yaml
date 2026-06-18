@@ -11,7 +11,8 @@ spec:
     targetRevision: "2.x.x"
     helm:
       values: |
-        watchNamespace: "dev"
+        {}
+
   destination:
     server: https://kubernetes.default.svc
     namespace: keda
