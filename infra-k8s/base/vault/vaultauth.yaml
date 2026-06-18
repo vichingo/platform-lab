@@ -1,0 +1,11 @@
+apiVersion: secrets.hasicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: openboa-auth
+spec:
+  vaultConnectionRef: openboa
+  method: token
+  mount: token
+  token:
+    secretRef: openboa-token
+    secretKey: token
