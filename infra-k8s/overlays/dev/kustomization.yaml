@@ -5,6 +5,6 @@ resources:
 namespace: dev
 images:
 - name: ghcr.io/vichingo/platform-lab/event-processor
-  newTag: 1358bf0e0390370bb0f32344da64d1b95665f4f7
+  newTag: af45e34eef5f592d19267acb7c9e12bfce9ae9ba
 - name: ghcr.io/vichingo/platform-lab/webhook-service
   newTag: d782374568b79f96efadeeb7a884572907fa5311
