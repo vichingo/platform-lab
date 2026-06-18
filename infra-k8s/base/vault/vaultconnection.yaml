@@ -1,7 +1,7 @@
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: VaultConnection
 metadata:
-  name: openboa
+  name: openbao
 spec:
   address: "http://host.k3d.internal:8200"
-  skipTlsVerify: true
+  skipTLSVerify: true
