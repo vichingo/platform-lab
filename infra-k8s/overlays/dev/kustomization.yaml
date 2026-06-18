@@ -6,3 +6,5 @@ namespace: dev
 images:
 - name: ghcr.io/vichingo/platform-lab/webhook-service
   newTag: 4883c79a7525c8cb877c53c487683ddbddbeb49d
+- name: ghcr.io/vichingo/platform-lab/event-processor
+  newTag: latest

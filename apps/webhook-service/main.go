@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+
+	"github.com/nats-io/nats.go"
 )
 
 func main() {
@@ -13,6 +15,19 @@ func main() {
 		slog.Error("API_KEY env var not set")
 		os.Exit(1)
 	}
+
+	natsURL := os.Getenv("NATS_URL")
+	if natsURL == "" {
+		natsURL = nats.DefaultURL
+	}
+
+	nc, err := nats.Connect(natsURL)
+	if err != nil {
+		slog.Error("failed to connect to NATS", "url", natsURL, "err", err)
+		os.Exit(1)
+	}
+	defer nc.Close()
+	slog.Info("connected to NATS", "url", natsURL)
 
 	mux := http.NewServeMux()
 
@@ -34,7 +49,14 @@ func main() {
 			return
 		}
 
-		slog.Info("webhook received", "payload", payload)
+		data, _ := json.Marshal(payload)
+		if err := nc.Publish("webhooks.events", data); err != nil {
+			slog.Error("failed to publish to NATS", "err", err)
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+
+		slog.Info("webhook published", "subject", "webhooks.events", "payload", payload)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"status": "accepted"})
