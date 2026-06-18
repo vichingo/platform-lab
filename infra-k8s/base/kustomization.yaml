@@ -8,3 +8,4 @@ resources:
   - vault/
   - webhook-service/
   - event-processor/
+  - monitoring/
