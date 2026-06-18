@@ -19,7 +19,8 @@ spec:
             - --provider=keycloak-oidc
             - --client-id=webhook-service
             - --client-secret=b9DQc6V3jUomNRQGMosu4xNGogSvRQ6r
-            - --oidc-issuer-url=http://auth.localhost/realms/platform-lab
+            - --oidc-issuer-url=http://keycloak.dev.svc.cluster.local/realms/platform-lab
+            - --insecure-oidc-skip-issuer-verification=true
             - --upstream=static://200
             - --http-address=0.0.0.0:4180
             - --skip-jwt-bearer-tokens=true
