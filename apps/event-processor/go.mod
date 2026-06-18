@@ -1,6 +1,6 @@
 module github.com/vichingo/platform-lab/event-processor
 
-go 1.26.4
+go 1.25
 
 require (
 	github.com/klauspost/compress v1.18.5 // indirect
