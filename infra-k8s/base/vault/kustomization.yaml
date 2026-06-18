@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - vaultauth.yaml
   - vaultconnection.yaml
+  - vaultstaticsecret.yaml
