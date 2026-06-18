@@ -23,6 +23,8 @@ spec:
                 secretKeyRef:
                   name: echo-api-key
                   key: api_key
+            - name: NATS_URL
+              value: nats://nats.dev.svc.cluster.local:4222
           livenessProbe:
             httpGet:
               path: /health

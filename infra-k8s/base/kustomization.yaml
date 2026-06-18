@@ -7,3 +7,4 @@ resources:
   - auth-proxy/
   - vault/
   - webhook-service/
+  - event-processor/
