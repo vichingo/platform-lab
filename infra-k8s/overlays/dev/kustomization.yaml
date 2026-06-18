@@ -1,8 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base
+- ../../base
 namespace: dev
 images:
-  - name: ghcr.io/vichingo/platform-lab/webhook-service
-    newTag: latest
+- name: ghcr.io/vichingo/platform-lab/webhook-service
+  newTag: 4883c79a7525c8cb877c53c487683ddbddbeb49d
