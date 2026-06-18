@@ -26,6 +26,7 @@ spec:
             - --skip-jwt-bearer-tokens=true
             - --email-domain=*
             - --cookie-secret=d8810fabf5a3366199434e3c3711fa38
+            - --insecure-oidc-allow-unverified-email=true
           ports:
             - containerPort: 4180
           resources:
