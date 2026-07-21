@@ -1,6 +1,15 @@
 # Managed API Platform (MAP) — Onderzoek
 
-> Sprint 8 actief (3 jun – 17 jun 2026)
+Persoonlijke notities over een managed-API-platform-architectuur die ik professioneel ben tegengekomen, bijgehouden over een aantal maanden.
+
+## Mijn persoonlijke tijdlijn
+
+| Periode | Wat ik meemaakte |
+|---------|------------------|
+| Maart 2026 | Voor het eerst goed kennisgemaakt met de architectuur — zag een belangrijke architectuurbeslissing (EventBus vs. Sync Service) langskomen |
+| Mei 2026 | Eerste live release meegemaakt; begon structureel notities bij te houden |
+| Eind mei – half juni 2026 | Vervolgstappen gezien (self-service portal, eerste externe klant aangesloten) |
+| 17 juni 2026 | Notities afgerond — besloten om zelf een mini-versie te bouwen om alles hands-on te leren. Dit repo is het resultaat |
 
 ---
 
@@ -110,9 +119,9 @@ OpenBao staat op een **shared EC2-instance** (buiten de K8s cluster), met eigen 
 
 ---
 
-## Wat is er klaar (Sprints 1–7, t/m jun 2026)
+## Wat ik heb zien groeien (voorjaar–vroege zomer 2026)
 
-### Release 1.0 (Sprint 5, 13 mei 2026)
+### Eerste live release die ik meemaakte (13 mei 2026)
 De initiële release bevatte:
 
 **Infrastructuur (externe infra-partner + interne infra-team)**
@@ -135,7 +144,7 @@ De initiële release bevatte:
 - Tenant-isolatie op gateway-niveau (`x-tenant-id` header)
 - Interne + externe documentatieportal (`docs.dev.connector.example.com`)
 
-### Sprints 6–7 (mei–jun 2026)
+### Vervolgstappen die ik zag (eind mei – half juni 2026)
 - Self-Service Portal: frontend (React/Vite) + API backend (Node.js), ArgoCD deployed
 - Klant A als eerste klant: tenant allowed in EventBridge, SSO via Microsoft EntraID
 - Interne gateway voor ECD-interne communicatie
@@ -146,9 +155,9 @@ De initiële release bevatte:
 
 ---
 
-## Wat is er nog NIET klaar (Sprint 8 + backlog)
+## Wat nog openstond toen ik stopte met observeren (medio juni 2026 + backlog)
 
-### Sprint 8 — actief op dit moment
+### Laatste openstaande punten die ik zag (medio juni 2026)
 
 | Omschrijving | Rol | Status |
 |-------------|-----|--------|
@@ -169,7 +178,7 @@ De initiële release bevatte:
 | Bug: EventBridge geeft 200 terug i.p.v. 500 bij ECD-fout | Backend | Ready for Testing |
 | Documentatie opmaak valideren | Documentatie/QA | In Progress |
 
-### Grote open punten (buiten Sprint 8)
+### Grote open punten (verder in de backlog)
 
 | Onderdeel | Toelichting |
 |-----------|------------|
@@ -180,7 +189,7 @@ De initiële release bevatte:
 | **Velero backup** | Cluster backup — gepland |
 | **24/7 dienstverlening** | Externe infra-partner moet nog helpen met strategie |
 | **IaC-overdracht** | Externe infra-partner moet nog kennis overdragen aan intern infra-team over de Terraform/OpenTofu code |
-| **Productie hardening** | PEN test was doel van Sprint 5/6, productie-deployment nog in gang |
+| **Productie hardening** | PEN test was doel van een eerdere fase, productie-deployment nog in gang |
 
 ---
 
@@ -201,7 +210,7 @@ Dit is het klantvacerende product van het MAP. Klanten beheren hier zelf hun kop
 - Certificaat manager (keurt certificaataanvragen goed)
 - PM + Security Officer (keuren nieuwe koppelingen goed via issue-tracker workflow)
 
-**Status:** Basis portal live (login/logout, sessies), Config Service (backend voor koppelingsdata) nu in aanleg (Sprint 8).
+**Status:** Basis portal live (login/logout, sessies), Config Service (backend voor koppelingsdata) nu in aanleg (laatste fase die ik zag).
 
 ---
 
@@ -338,7 +347,7 @@ Twee rollen zijn expliciet relevant: **Kubernetes Administrator** en **Platform 
 
 **Wat de rol nu concreet vraagt:**
 
-1. **ArgoCD beheer:** Elke sprint landen er nieuwe services (config-service nu, NATS straks). Manifesten omzetten naar werkende K8s-configuratie in `infra-k8s`.
+1. **ArgoCD beheer:** Elke fase landen er nieuwe services (config-service nu, NATS straks). Manifesten omzetten naar werkende K8s-configuratie in `infra-k8s`.
 2. **Observability stack bouwen:** Prometheus + Loki + Tempo + Grafana + Datadog-integratie — volledig open, hoge prioriteit.
 3. **NATS cluster opzetten:** Zodra de message broker-beslissing valt, moet de hele NATS + JetStream cluster uitgerold worden incl. KEDA scalers.
 4. **Keycloak realm-beheer:** Bij elke nieuwe klant: realm, client, scopes, identity brokering configureren.
