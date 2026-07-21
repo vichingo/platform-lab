@@ -1,15 +1,6 @@
 # Managed API Platform (MAP) — Onderzoek
 
-Ontwerp-notities voor de Managed API Platform-laag rond [bifrost-ordo](https://github.com/Bifrost-Software/bifrost-ordo), mijn eigen zorg-orchestratieplatform, bijgehouden over een aantal maanden.
-
-## Mijn persoonlijke tijdlijn
-
-| Periode | Wat ik deed |
-|---------|------------------|
-| Maart 2026 | Architectuurbeslissing genomen voor de API-laag rond bifrost-ordo (EventBus vs. Sync Service) |
-| Mei 2026 | Eerste live release van het platform uitgerold; begon structureel notities bij te houden |
-| Eind mei – half juni 2026 | Vervolgstappen gezet (self-service portal, eerste externe klant aangesloten) |
-| 17 juni 2026 | Kern van het ontwerp afgerond — besloten om de onderliggende tech stack in een apart leerproject te herhalen om alles hands-on te doorgronden. Dit repo is het resultaat |
+> Sprint 8 actief (3 jun – 17 jun 2026)
 
 ---
 
@@ -17,19 +8,19 @@ Ontwerp-notities voor de Managed API Platform-laag rond [bifrost-ordo](https://g
 
 | Use case | Focus | Mode | Richting |
 |----------|-------|------|----------|
-| **API** — extern systeem raadpleegt bifrost-ordo-data | **Nu actief** | Synchroon | Eenrichtingsverkeer |
-| **BI** — klant exporteert grote hoeveelheden bifrost-ordo-data naar BI-tooling | Toekomst | Asynchroon | Eenrichtingsverkeer |
-| **App dev** — intern app-team gebruikt eigen bifrost-ordo-data als dataset voor interne apps | Toekomst | Synchroon | Bidirectioneel (multi-master?) |
+| **API** — extern systeem raadpleegt ECD data | **Nu actief** | Synchroon | Eenrichtingsverkeer |
+| **BI** — klant exporteert grote hoeveelheden ECD data naar BI-tooling | Toekomst | Asynchroon | Eenrichtingsverkeer |
+| **App dev** — intern app-team gebruikt eigen ECD data als dataset voor interne apps | Toekomst | Synchroon | Bidirectioneel (multi-master?) |
 | **Subscriptions** — externe app ontvangt webhook bij datawijziging | Toekomst | Event-driven | Eenrichtingsverkeer |
 
 ---
 
 ## Wat is het MAP?
 
-Het Managed API Platform is een **middleware-platform** dat staat tussen bifrost-ordo (mijn ECD/EPD-systeem) en externe partijen (zorgorganisaties, applicaties, partners). Het platform biedt:
+Het Managed API Platform is een **middleware-platform** dat staat tussen het interne ECD/EPD-systeem en externe partijen (zorgorganisaties, applicaties, partners). Het platform biedt:
 
-- Externe partijen beveiligde API-toegang tot bifrost-ordo-data via tokens + certificaten
-- Een sync-mechanisme waarmee wijzigingen in bifrost-ordo asynchroon worden bijgehouden in een Externe Database (EDB)
+- Externe partijen beveiligde API-toegang tot ECD-data via tokens + certificaten
+- Een sync-mechanisme waarmee wijzigingen in het ECD-systeem asynchroon worden bijgehouden in een Externe Database (EDB)
 - Een Self-Service Portal voor klanten om koppelingen zelf te beheren
 - Standaard authenticatie, certificaatbeheer en monitoring voor alle integraties
 
@@ -48,11 +39,11 @@ Traefik Gateway  ──── Keycloak (token validatie)
     ▼
 EventBridge (Node.js/TS)
     │
-    ├──► OnPremBridge (op bifrost-ordo Windows server, .NET Windows service)
+    ├──► OnPremBridge (op ECD Windows server, .NET Windows service)
     │         │
-    │         └──► bifrost-ordo (via interne connector)
+    │         └──► ECD-systeem (via interne connector)
     │
-    └──► Externe Database (EDB)  ◄── Transformatie Service ◄── bifrost-ordo
+    └──► Externe Database (EDB)  ◄── Transformatie Service ◄── ECD-systeem
               │
               └──► Semantische Service ──► Externe Partij (response)
 ```
@@ -60,7 +51,7 @@ EventBridge (Node.js/TS)
 **Architecturele beslissing — GENOMEN (17 maart 2026):**
 Beide opties worden **parallel** uitgevoerd:
 - **Option A (EventBus — huidig):** Queue-mechanisme naar MAP brengen. Acceptabele performance voor nu. Klanten worden later gemigreerd.
-- **Option B (Sync Service — eindoplossing):** Async bifrost-ordo→EDB sync parallel ontwikkelen (Transformatie Service, Schema Service, EDB). Zodra klaar: klanten omzetten.
+- **Option B (Sync Service — eindoplossing):** Async ECD→EDB sync parallel ontwikkelen (Transformatie Service, Schema Service, EDB). Zodra klaar: klanten omzetten.
 
 Reden: klantcommitments zo klein mogelijk houden, performance van Option A is bewust geaccepteerd als tijdelijk.
 
@@ -82,7 +73,7 @@ Reden: klantcommitments zo klein mogelijk houden, performance van Option A is be
 | CI/CD | GitHub Actions → ECR → ArgoCD sync | Live |
 | Container registry | AWS ECR | Live |
 | Backend services | TypeScript / Node.js (monorepo: `services-catalog`) | Live |
-| On-prem connector | OnPremBridge (.NET Windows service op bifrost-ordo-servers) | Live |
+| On-prem connector | OnPremBridge (.NET Windows service op ECD-servers) | Live |
 | Frontend | Vite + React | Live |
 | Database | RDS PostgreSQL (voor Configuration Service) | In aanleg |
 | File service | SFTPGo (open source, S3 backend, OIDC plugin) — ADR.002 | Gepland |
@@ -119,9 +110,9 @@ OpenBao staat op een **shared EC2-instance** (buiten de K8s cluster), met eigen 
 
 ---
 
-## Wat ik heb gebouwd (voorjaar–vroege zomer 2026)
+## Wat is er klaar (Sprints 1–7, t/m jun 2026)
 
-### Eerste live release (13 mei 2026)
+### Release 1.0 (Sprint 5, 13 mei 2026)
 De initiële release bevatte:
 
 **Infrastructuur (externe infra-partner + interne infra-team)**
@@ -144,10 +135,10 @@ De initiële release bevatte:
 - Tenant-isolatie op gateway-niveau (`x-tenant-id` header)
 - Interne + externe documentatieportal (`docs.dev.connector.example.com`)
 
-### Vervolgstappen (eind mei – half juni 2026)
+### Sprints 6–7 (mei–jun 2026)
 - Self-Service Portal: frontend (React/Vite) + API backend (Node.js), ArgoCD deployed
 - Klant A als eerste klant: tenant allowed in EventBridge, SSO via Microsoft EntraID
-- Interne gateway voor bifrost-ordo-interne communicatie
+- Interne gateway voor ECD-interne communicatie
 - POST/PUT/DELETE implementatie op EventBridge
 - OnPremBridge healthcheck
 - Productie namespace ingericht
@@ -155,9 +146,9 @@ De initiële release bevatte:
 
 ---
 
-## Wat nog openstond toen ik de kern klaar had (medio juni 2026 + backlog)
+## Wat is er nog NIET klaar (Sprint 8 + backlog)
 
-### Laatste openstaande punten (medio juni 2026)
+### Sprint 8 — actief op dit moment
 
 | Omschrijving | Rol | Status |
 |-------------|-----|--------|
@@ -175,21 +166,21 @@ De initiële release bevatte:
 | POC: opzet voor testen sync | Developer | In Progress |
 | Authentication — Sessiebeheer (session timeout, refresh) | Backend | Ready for Testing |
 | Werkruimte aanmaken vanuit intern systeem → Klant A (FHIR endpoint) | Backend | Ready for Testing |
-| Bug: EventBridge geeft 200 terug i.p.v. 500 bij bifrost-ordo-fout | Backend | Ready for Testing |
+| Bug: EventBridge geeft 200 terug i.p.v. 500 bij ECD-fout | Backend | Ready for Testing |
 | Documentatie opmaak valideren | Documentatie/QA | In Progress |
 
-### Grote open punten (verder in de backlog)
+### Grote open punten (buiten Sprint 8)
 
 | Onderdeel | Toelichting |
 |-----------|------------|
 | **Observability stack** | Prometheus, Loki, Tempo, Grafana, Datadog — volledig nog op te bouwen |
 | **NATS message broker** | Keuze tussen NATS / SQS / Redpanda nog open. Kern van toekomstige event-driven architectuur |
-| **Sync Service (Option B)** | De architectuurkeuze voor async bifrost-ordo→EDB sync moet ik nog definitief maken. Zodra beslist: Transformatie Service, Schema Service, Database Service moeten gebouwd worden |
+| **Sync Service (Option B)** | De architectuurkeuze voor async ECD→EDB sync ligt bij management. Als goedgekeurd: Transformatie Service, Schema Service, Database Service moeten gebouwd worden |
 | **KEDA** | Event-driven autoscaling (op NATS queue-diepte) — gepland maar nog niet gestart |
 | **Velero backup** | Cluster backup — gepland |
 | **24/7 dienstverlening** | Externe infra-partner moet nog helpen met strategie |
 | **IaC-overdracht** | Externe infra-partner moet nog kennis overdragen aan intern infra-team over de Terraform/OpenTofu code |
-| **Productie hardening** | PEN test was doel van een eerdere fase, productie-deployment nog in gang |
+| **Productie hardening** | PEN test was doel van Sprint 5/6, productie-deployment nog in gang |
 
 ---
 
@@ -210,13 +201,13 @@ Dit is het klantvacerende product van het MAP. Klanten beheren hier zelf hun kop
 - Certificaat manager (keurt certificaataanvragen goed)
 - PM + Security Officer (keuren nieuwe koppelingen goed via issue-tracker workflow)
 
-**Status:** Basis portal live (login/logout, sessies), Config Service (backend voor koppelingsdata) nu in aanleg (laatste fase in dit ontwerp).
+**Status:** Basis portal live (login/logout, sessies), Config Service (backend voor koppelingsdata) nu in aanleg (Sprint 8).
 
 ---
 
 ## Sync-architectuur (Option B) — updatebericht schema
 
-Wanneer een object wijzigt in bifrost-ordo wordt een gestandaardiseerd updatebericht gestuurd naar de Transformatie Service.
+Wanneer een object wijzigt in het ECD-systeem wordt een gestandaardiseerd updatebericht gestuurd naar de Transformatie Service.
 
 **Berichtstructuur (JSON, versie 1.0.0):**
 
@@ -226,17 +217,17 @@ Wanneer een object wijzigt in bifrost-ordo wordt een gestandaardiseerd updateber
     "messageId": "uuid-v4",
     "timestamp": "2025-01-15T10:32:00.000Z",
     "schemaVersion": "1.0.0",
-    "sourceApplication": "bifrost-ordo",
+    "sourceApplication": "ECDSysteem",
     "syncType": "incremental | full",
     "mutationType": "create | update | delete"
   },
   "object": {
     "objectType": "Cliënt",
-    "ak": "ORDO-CLIENT-00123"
+    "ak": "ECD-CLIENT-00123"
   },
   "changes": {
     "fields": [
-      { "ak": "ORDO-FIELD-GEBOORTEDATUM", "newValue": "1980-05-14" }
+      { "ak": "ECD-FIELD-GEBOORTEDATUM", "newValue": "1980-05-14" }
     ]
   }
 }
@@ -252,7 +243,7 @@ Wanneer een object wijzigt in bifrost-ordo wordt een gestandaardiseerd updateber
 - `delete`-berichten bevatten geen `changes`-blok — alleen het `object.ak` is voldoende
 
 **Schema Service (gepland):**
-Centrale service die objectstructuren beschikbaar stelt op basis van bronapp + schemaversie + objecttype. Bifrost-ordo levert Swagger/JSON Schema via een interne connector. Historische versies worden bewaard (ook fixpacks). Voedt ook de documentatieportal.
+Centrale service die objectstructuren beschikbaar stelt op basis van bronapp + schemaversie + objecttype. Het ECD-systeem levert Swagger/JSON Schema via een interne connector. Historische versies worden bewaard (ook fixpacks). Voedt ook de documentatieportal.
 
 **EDB ontsluiting (gepland):**
 - In scope: REST GET/SEARCH, FHIR queries
@@ -274,13 +265,13 @@ Centrale service die objectstructuren beschikbaar stelt op basis van bronapp + s
 
 ## OnPremBridge — on-prem connector
 
-De OnPremBridge is een .NET Windows Service die draait op dezelfde servers als bifrost-ordo:
+De OnPremBridge is een .NET Windows Service die draait op dezelfde servers als het ECD-systeem:
 - Communiceert via **TCP** met EventBridge (in AWS)
 - Communiceert via **HTTP** met de interne connector (lokaal)
 - Queue-mechanisme: `GET /queue` + `PUT /queue` (correlation ID gebaseerd)
 - Geïnstalleerd via installatiescript op Windows servers
 
-**Debugging:** lokaal via ngrok (bridge exposed via ngrok, URL tijdelijk in bifrost-ordo instellen).
+**Debugging:** lokaal via ngrok (bridge exposed via ngrok, URL tijdelijk in het ECD-systeem instellen).
 
 ---
 
@@ -308,7 +299,7 @@ Node.js/TS service binnen het MAP-cluster:
 
 ---
 
-## AWS IAM-rollen (voor mijn infra-werk)
+## AWS IAM-rollen (relevant voor infra-rol)
 
 Twee rollen zijn gedefinieerd voor de infra-kant:
 
@@ -335,25 +326,25 @@ Twee rollen zijn gedefinieerd voor de infra-kant:
 | # | Issue | Status | Toelichting |
 |---|-------|--------|------------|
 | 1 | Applicatiebeheer/ops bemensing | Open | Inzicht geven in type werkzaamheden; wie neemt dit over vanuit dev-kant? |
-| 2 | Accountinfo meegeven bij API calls | Open | Zonder account-context kan een arts journaalregels van een fysiotherapeut lezen — autorisatie-lek bij rolgebaseerde toegang in bifrost-ordo |
+| 2 | Accountinfo meegeven bij API calls | Open | Zonder account-context kan een arts journaalregels van een fysiotherapeut lezen — autorisatie-lek bij rolgebaseerde toegang in het ECD-systeem |
 | 3 | SSO Klant A kost te veel tijd | Open | EntraID + Keycloak in productie kost disproportioneel veel tijd |
 | 4 | Issue-tracker workflow inrichten | Bezig | Nieuwe flow voor aanvragen van API-koppelingen, certificaten, etc. |
 
 ---
 
-## Wat dit betekent voor mijn eigen infra-werk
+## Relevantie voor de K8s platform-rol
 
-Ik combineer zelf de rollen van **Kubernetes Administrator** en **Platform Engineer** voor dit platform. De externe infra-partner doet alleen de AWS-kant (Terraform, VPC, EKS provisioning). Alles ín de cluster valt onder mijn eigen verantwoordelijkheid.
+Twee rollen zijn expliciet relevant: **Kubernetes Administrator** en **Platform Engineer**. De externe infra-partner doet alleen de AWS-kant (Terraform, VPC, EKS provisioning). Alles ín de cluster valt onder de interne verantwoordelijkheid.
 
-**Wat dit concreet van me vraagt:**
+**Wat de rol nu concreet vraagt:**
 
-1. **ArgoCD beheer:** Elke fase landen er nieuwe services (config-service nu, NATS straks). Manifesten omzetten naar werkende K8s-configuratie in `infra-k8s`.
+1. **ArgoCD beheer:** Elke sprint landen er nieuwe services (config-service nu, NATS straks). Manifesten omzetten naar werkende K8s-configuratie in `infra-k8s`.
 2. **Observability stack bouwen:** Prometheus + Loki + Tempo + Grafana + Datadog-integratie — volledig open, hoge prioriteit.
 3. **NATS cluster opzetten:** Zodra de message broker-beslissing valt, moet de hele NATS + JetStream cluster uitgerold worden incl. KEDA scalers.
 4. **Keycloak realm-beheer:** Bij elke nieuwe klant: realm, client, scopes, identity brokering configureren.
 5. **OpenBao PKI:** Certificate lifecycle, rotatie, TTLs, PKI rollen per namespace.
 6. **Traefik middleware:** IngressRoutes, ForwardAuth, rate limiting, circuit breakers configureren per service.
 7. **Karpenter:** Node-scaling al live, maar tuning + uitbreiding bij groei.
-8. **Vertaalslag dev → infra:** Mijn eigen backend-werk levert env-variabelen en service-configuratie op, die ik vertaal naar K8s manifests, ArgoCD applicaties en secrets in OpenBao.
+8. **Vertaalslag dev → infra:** Developers geven env-variabelen en service-configuratie, jij maakt de K8s manifests, ArgoCD applicatie en secrets in OpenBao.
 
-**Huidig knelpunt:** Ik doe dit nu alleen naast de rest van het werk en loop achter — de config-service infra-taken staan allemaal nog open terwijl de code al bijna klaar is. Hier zit de directe toegevoegde waarde van meer diepgang in dit vakgebied.
+**Huidig knelpunt:** Het infra-team doet dit nu alleen en loopt achter — de config-service infra-taken staan allemaal nog open terwijl de code al bijna klaar is. Hier zit de directe toegevoegde waarde.
