@@ -1,11 +1,11 @@
 # Platform Lab
 
-Persoonlijk leerproject gebaseerd op een Managed API Platform (MAP)-architectuur die ik professioneel ben tegengekomen.
-Doel: alle technologieën die in zo'n platform gebruikt worden hands-on leren door een werkende mini-versie te bouwen.
+Persoonlijk leerproject gebaseerd op de Managed API Platform (MAP)-architectuur die ik aan het ontwerpen ben voor [bifrost-ordo](https://github.com/Bifrost-Software/bifrost-ordo), mijn eigen zorg-orchestratieplatform.
+Doel: alle technologieën die in zo'n platform gebruikt worden hands-on leren door een werkende mini-versie te bouwen, los van de productiecode van bifrost-ordo zelf.
 
 ## Context
 
-Zie [docs/MAP_platform_onderzoek.md](docs/MAP_platform_onderzoek.md) voor het volledige onderzoek van het MAP-project.
+Zie [docs/MAP_platform_onderzoek.md](docs/MAP_platform_onderzoek.md) voor het volledige ontwerp-onderzoek achter het MAP-concept.
 
 ## Stack
 
@@ -23,7 +23,7 @@ Zie [docs/MAP_platform_onderzoek.md](docs/MAP_platform_onderzoek.md) voor het vo
 
 ## Use case
 
-Een **webhook relay + event bus**: externe services sturen events (GitHub webhooks, HTTP triggers, etc.) naar het platform. Het platform routeert, transformeert en stuurt door naar andere endpoints. Mirrors het gateway → on-prem-connector-patroon van het originele platform.
+Een **webhook relay + event bus**: externe services sturen events (GitHub webhooks, HTTP triggers, etc.) naar het platform. Het platform routeert, transformeert en stuurt door naar andere endpoints. Mirrors het gateway → on-prem-connector-patroon dat ik voor bifrost-ordo's API-laag heb uitgedacht.
 
 ## Fases
 
